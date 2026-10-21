@@ -45,10 +45,22 @@ class _HomeScreenState extends State<HomeScreen> {
                   Text(
                     'Flick',
                     style: TextStyle(
-                      color: const Color(0xFFCBD5E1),
+                      color: Colors.white,
+                      fontSize: sizeOfContainer * 0.18,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  Text(
+                    "Fast, Secure. No internet needed.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: const Color(0xFFCBD5E1), 
                       fontSize: sizeOfContainer * 0.075,
                       fontWeight: FontWeight.w400,
-                    )
+                    ),
                   ),
 
                   SizedBox(height: (size.height * 0.08).clamp(20.0, 80.0)),
