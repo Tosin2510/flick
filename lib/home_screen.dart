@@ -1,4 +1,5 @@
 import 'package:flick/action_icon_button.dart';
+import 'package:flick/app_animation_logo.dart';
 import 'package:flick/buttom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 
@@ -39,6 +40,15 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 children: [
                   SizedBox(height: size.height * 0.05),
+
+                  FutureBuilder<bool>(
+                    future: Future.value(true),                    
+                    builder: ((context, snapshot) {
+                      return AppAnimationLogo(
+                        sizeOfContainer: sizeOfContainer, isPreferenceAnimation: snapshot.data ?? true,
+                      );
+                    })
+                  ),
 
                   SizedBox(height: isSmallScreen ? 20 : 40,),
 
@@ -82,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           icon: Icons.near_me_outlined,
                           sizeOfContainer: sizeOfContainer,
                           onPressed: () {
-                            // To be implemented
+                            refreshPageUponNavigation(0);
                           }
                         ),
 
@@ -91,7 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           icon: Icons.file_download_outlined,
                           sizeOfContainer: sizeOfContainer,
                           onPressed: () {
-                            // To be implemented
+                            refreshPageUponNavigation(1);
                           }
                         ),
                         ActionIconButton(
@@ -99,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           icon: Icons.history_rounded,
                           sizeOfContainer: sizeOfContainer,
                           onPressed: () {
-                            // To be implemented
+                            refreshPageUponNavigation(2);
                           }
                         ),
 
@@ -108,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           icon: Icons.settings_outlined,
                           sizeOfContainer: sizeOfContainer,
                           onPressed: () {
-                            // To be implemented
+                            refreshPageUponNavigation(3);
                           }
                         ),
                       ]
