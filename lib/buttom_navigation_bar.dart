@@ -4,16 +4,16 @@ import 'package:flick/send_screen.dart';
 import 'package:flick/settings_screen.dart';
 import 'package:flutter/material.dart';
 
-class ButtomNavBar extends StatefulWidget {
+class BottomNavBar extends StatefulWidget {
   final int initialIndex;
 
-  const ButtomNavBar({super.key, this.initialIndex = 0});
+  const BottomNavBar({super.key, this.initialIndex = 0});
 
   @override
-  State<ButtomNavBar> createState() => _ButtomNavBarState();
+  State<BottomNavBar> createState() => _ButtomNavBarState();
 }
 
-class _ButtomNavBarState extends State<ButtomNavBar> {
+class _ButtomNavBarState extends State<BottomNavBar> {
   late int currentlySelectedIndex;
   @override
   void initState() {

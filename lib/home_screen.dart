@@ -1,4 +1,5 @@
 import 'package:flick/action_icon_button.dart';
+import 'package:flick/buttom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -9,6 +10,17 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+
+  Future<void> refreshPageUponNavigation(int index) async {
+    await Navigator.push(
+      context, 
+      MaterialPageRoute(
+        builder: (_) {
+          return BottomNavBar(initialIndex: index);
+        }
+      )
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

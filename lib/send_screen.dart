@@ -98,6 +98,8 @@ class _SendScreenState extends State<SendScreen> {
                         }
                       ),
 
+                      SizedBox(width: 3),
+
                       SendSelectionButton(
                         buttonTitle: "Apps", 
                         buttonIcon: Icons.grid_view_outlined, 
@@ -112,6 +114,7 @@ class _SendScreenState extends State<SendScreen> {
                           });
                         }
                       ),
+                      SizedBox(width: 3),
 
                       SendSelectionButton(
                         buttonTitle: "Music", 
@@ -127,6 +130,7 @@ class _SendScreenState extends State<SendScreen> {
                           });
                         }
                       ),
+                      SizedBox(width: 3),
 
                       SendSelectionButton(
                         buttonTitle: "Media", 
