@@ -1,7 +1,9 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flick/general_file_picking_service.dart';
+import 'package:flick/media_picker_service.dart';
 import 'package:flick/send_selection_button.dart';
 import 'package:flutter/material.dart';
+import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 class SendScreen extends StatefulWidget {
   const SendScreen({super.key});
@@ -20,6 +22,9 @@ class _SendScreenState extends State<SendScreen> {
   final Color inactiveButtonColor = const Color(0xFF1F1F1F);
   final Color inactiveTextColor = const Color(0XFFFFFFFF);
 
+  final MediaPickerService mediaPickerService = MediaPickerService();
+
+  List<AssetEntity> selectedMediaFiles = [];
 
 Future<void> pickGeneralFiles(String fileCategory) async {
   if (isLoading) return;
@@ -51,6 +56,45 @@ Future<void> pickGeneralFiles(String fileCategory) async {
             isLoading = false;
           });
     }  
+}
+
+Future<void> pickMediaFiles() async {
+  if (isLoading) return;
+  setState(() {
+    isLoading = true;
+  });
+
+  try {
+    final List<AssetEntity>? mediaFiles = await mediaPickerService.pickMediaFiles(context);
+    if (!mounted) return;
+    if (mediaFiles != null && mediaFiles.isNotEmpty) {
+      final unselectedMediaFiles = mediaFiles.where((value) {
+        return !selectedMediaFiles.any((val) {
+          return val.id == value.id;
+        });
+      }).toList();
+
+      final result = await Future.wait(unselectedMediaFiles.map((mediaFiles) async {
+        final fileInfo = await mediaFiles.file;
+        final fileSize = fileInfo != null ? await fileInfo.length() : 0;
+        return MapEntry(mediaFiles, fileSize);
+      }));
+
+      if (!mounted) return;
+      setState(() {
+        for (final entry in result) {
+          selectedMediaFiles.add(entry.key);
+          totalSizeOfBytes += entry.value;
+        }
+      });
+    }
+  } catch (e) {
+    debugPrint("Error picking media files: $e");
+  } finally {
+    setState(() {
+      isLoading = false;
+    });
+  }
 }
 
   @override
@@ -188,10 +232,12 @@ Future<void> pickGeneralFiles(String fileCategory) async {
                         activeButtonColor: activeButtonColor, 
                         inactiveButtonColor: inactiveButtonColor, 
                         inactiveTextColor: inactiveTextColor,
-                        onPressed: () {
+                        onPressed: () async {
                           setState(() {
                             selectedIconButton = "Media";
                           });
+
+                          await pickMediaFiles();
                         }
                       )
                     ]
