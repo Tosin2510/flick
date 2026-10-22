@@ -1,6 +1,6 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flick/general_file_picking_service.dart';
-import 'package:flick/media_picker_service.dart';
+import 'package:flick/media_picking_service.dart';
 import 'package:flick/send_selection_button.dart';
 import 'package:flutter/material.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';

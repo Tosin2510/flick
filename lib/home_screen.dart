@@ -1,4 +1,4 @@
-import 'package:flick/action_icon_button.dart';
+import 'package:flick/icon_button.dart';
 import 'package:flick/app_animation_logo.dart';
 import 'package:flick/buttom_navigation_bar.dart';
 import 'package:flutter/material.dart';
@@ -87,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                       children: [
 
-                        ActionIconButton(
+                        IconBut(
                           title: "Send",
                           icon: Icons.near_me_outlined,
                           sizeOfContainer: sizeOfContainer,
@@ -96,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           }
                         ),
 
-                        ActionIconButton(
+                        IconBut(
                           title: "Receive",
                           icon: Icons.file_download_outlined,
                           sizeOfContainer: sizeOfContainer,
@@ -104,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             refreshPageUponNavigation(1);
                           }
                         ),
-                        ActionIconButton(
+                        IconBut(
                           title: "History",
                           icon: Icons.history_rounded,
                           sizeOfContainer: sizeOfContainer,
@@ -113,7 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           }
                         ),
 
-                        ActionIconButton(
+                        IconBut(
                           title: "Settings",
                           icon: Icons.settings_outlined,
                           sizeOfContainer: sizeOfContainer,

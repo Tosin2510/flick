@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-class ActionIconButton extends StatelessWidget {
+class IconBut extends StatelessWidget {
   final String title;
   final IconData icon;
   final double sizeOfContainer;
   final VoidCallback onPressed;
 
-   const ActionIconButton({
+   const IconBut({
     super.key,
     required this.title,
     required this.icon,
