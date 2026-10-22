@@ -1,8 +1,14 @@
+import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
+import 'package:flick/app_picking_service.dart';
+import 'package:flick/app_ppicking_sheet.dart';
 import 'package:flick/general_file_picking_service.dart';
 import 'package:flick/media_picking_service.dart';
+import 'package:flick/path_to_apks_service.dart';
 import 'package:flick/send_selection_button.dart';
 import 'package:flutter/material.dart';
+import 'package:installed_apps/app_info.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 class SendScreen extends StatefulWidget {
@@ -28,6 +34,10 @@ class _SendScreenState extends State<SendScreen> {
   
   final List<int> sizeOfMediaFilesInBytes = [];
   final List<int> sizeOfGeneralFilesInBytes = [];
+
+  List<AppInfo> selectedApps = [];
+  List<int> sizeOfAppsInBytes = [];
+  List<List<String>> apkPathsOfApps = [];
 
 Future<void> pickGeneralFiles(String fileCategory) async {
   if (isLoading) return;
@@ -93,6 +103,76 @@ Future<void> pickMediaFiles() async {
     }
   } catch (e) {
     debugPrint("Error picking media files: $e");
+  } finally {
+    if (mounted) {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+}
+
+Future<void> pickApps() async {
+  if (isLoading) return;
+
+  setState(() {
+    isLoading = true;
+  });
+
+  try {
+    List<AppInfo> apps = await AppPickingService.getInstalledApps();
+    if (!mounted) return;
+
+    setState(() {
+      isLoading = false;
+    });
+
+    List<AppInfo>? selected =  await showModalBottomSheet<List<AppInfo>>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: inactiveButtonColor,
+      builder: (context) {
+        return AppPickingSheet(apps: apps);
+      },
+    );
+
+    if (!mounted) return;
+
+    if (selected == null || selected.isEmpty) return;
+
+    setState(() {
+      isLoading = true;
+    });
+
+    for (final app in selected) {
+      bool isAlreadyThere = false;
+      for(AppInfo existingApp in selectedApps) {
+        if (existingApp.packageName == app.packageName) {
+          isAlreadyThere = true;
+        }
+      }
+
+       if(isAlreadyThere) continue;
+
+       List<String> appApkPath = await PathToApksService.getApkPaths(app.packageName);
+      if (appApkPath.isEmpty) continue;
+
+      int sizeOfAppInBytes = 0;
+      for (String path in appApkPath) {
+        File apkFile = File(path);
+        sizeOfAppInBytes += await apkFile.length();
+      }
+
+       selectedApps.add(app);
+       apkPathsOfApps.add(appApkPath);
+       sizeOfAppsInBytes.add(sizeOfAppInBytes);
+       totalSizeOfBytes += sizeOfAppInBytes;
+    }
+
+    if (!mounted) return;
+    setState(() {});
+  } catch(e) {
+    debugPrint("Error picking apps: $e");
   } finally {
     if (mounted) {
       setState(() {
@@ -203,10 +283,12 @@ Future<void> pickMediaFiles() async {
                         activeButtonColor: activeButtonColor, 
                         inactiveButtonColor: inactiveButtonColor, 
                         inactiveTextColor: inactiveTextColor,
-                        onPressed: () {
+                        onPressed: () async {
                           setState(() {
                             selectedIconButton = "Apps";
                           });
+
+                          await pickApps();
                         }
                       ),
                       SizedBox(width: 3),
@@ -249,14 +331,14 @@ Future<void> pickMediaFiles() async {
                   )
                 ),
 
-                if (selectedGeneralFiles.isNotEmpty || selectedMediaFiles.isNotEmpty)
+                if (selectedGeneralFiles.isNotEmpty || selectedMediaFiles.isNotEmpty || selectedApps.isNotEmpty)
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: size.height * 0.02),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "${selectedGeneralFiles.length + selectedMediaFiles.length} Files • ${(totalSizeOfBytes / (1024 * 1024)).toStringAsFixed(2)} MB",
+                        "${selectedGeneralFiles.length + selectedMediaFiles.length + selectedApps.length} Files • ${(totalSizeOfBytes / (1024 * 1024)).toStringAsFixed(2)} MB",
                         style: TextStyle(
                           color: Colors.white70,
                           fontSize: sizeOfContainer * 0.06,
@@ -269,6 +351,9 @@ Future<void> pickMediaFiles() async {
                         sizeOfGeneralFilesInBytes.clear();
                         selectedMediaFiles.clear();
                         sizeOfMediaFilesInBytes.clear();
+                        selectedApps.clear();
+                        sizeOfAppsInBytes.clear();
+                        apkPathsOfApps.clear();
                         totalSizeOfBytes = 0;
                       }),
 
@@ -302,7 +387,7 @@ Future<void> pickMediaFiles() async {
                     Positioned.fill(
                       child: isLoading ? const Center(child: CircularProgressIndicator(color: Color(0xFF258CF4)))
                       
-                      : selectedGeneralFiles.isEmpty && selectedMediaFiles.isEmpty ? Center(
+                      : selectedGeneralFiles.isEmpty && selectedApps.isEmpty && selectedMediaFiles.isEmpty ? Center(
                         child: Text(
     
                           "No files selected",
@@ -318,7 +403,7 @@ Future<void> pickMediaFiles() async {
                         padding: EdgeInsets.only(
                           bottom: MediaQuery.of(context).size.height * 0.07 + MediaQuery.of(context).padding.bottom + 32
                         ),
-                        itemCount: selectedGeneralFiles.length + selectedMediaFiles.length,
+                        itemCount: selectedGeneralFiles.length + selectedMediaFiles.length + selectedApps.length,
                         itemBuilder: ((context, index) {
                           String fileDisplayName = '';
                           double fileSizeInBytes = 0;
@@ -330,12 +415,17 @@ Future<void> pickMediaFiles() async {
                             fileSizeInBytes = sizeOfGeneralFilesInBytes[index].toDouble();                            
                             fileIcon = Icons.insert_drive_file_rounded;
 
-                          } else {
+                          } else if (index < selectedGeneralFiles.length + selectedMediaFiles.length) {
                             final mediaIndex = index - selectedGeneralFiles.length;
                             final mediaFile = selectedMediaFiles[mediaIndex];
                             fileDisplayName = mediaFile.title ?? 'Media File';
                             fileSizeInBytes = sizeOfMediaFilesInBytes[mediaIndex].toDouble();
                             fileIcon = mediaFile.type == AssetType.video ? Icons.video_collection_rounded: Icons.image_rounded;
+                          } else {
+                            final appIndex = index - selectedGeneralFiles.length - selectedMediaFiles.length;
+                            fileDisplayName = selectedApps[appIndex].name;
+                            fileSizeInBytes = sizeOfAppsInBytes[appIndex].toDouble();
+                            fileIcon = Icons.android;
                           }
 
                           return Container(
@@ -396,11 +486,17 @@ Future<void> pickMediaFiles() async {
                                       selectedGeneralFiles.removeAt(index);
                                       sizeOfGeneralFilesInBytes.removeAt(index);
 
-                                    } else {
+                                    } else if (index < selectedGeneralFiles.length + selectedMediaFiles.length) {
                                       final mediaIndex = index - selectedGeneralFiles.length;
                                       totalSizeOfBytes -= sizeOfMediaFilesInBytes[mediaIndex];
                                       selectedMediaFiles.removeAt(mediaIndex);
                                       sizeOfMediaFilesInBytes.removeAt(mediaIndex);
+                                    } else {
+                                      final appIndex = index - selectedGeneralFiles.length - selectedMediaFiles.length;
+                                      totalSizeOfBytes -= sizeOfAppsInBytes[appIndex];
+                                      selectedApps.removeAt(appIndex);
+                                      sizeOfAppsInBytes.removeAt(appIndex);
+                                      apkPathsOfApps.removeAt(appIndex);
                                     }
                                   });
                                 },
@@ -417,7 +513,7 @@ Future<void> pickMediaFiles() async {
                       )
                     ),
 
-                    if (selectedGeneralFiles.isNotEmpty || selectedMediaFiles.isNotEmpty)
+                    if (selectedGeneralFiles.isNotEmpty || selectedMediaFiles.isNotEmpty || selectedApps.isNotEmpty)
                     Positioned(
                       left: MediaQuery.of(context).size.width * 0.04, 
                       right: MediaQuery.of(context).size.width * 0.04,
@@ -446,7 +542,7 @@ Future<void> pickMediaFiles() async {
 
                           child: Center(
                             child: Text(
-                              "Send ${selectedGeneralFiles.length + selectedMediaFiles.length} files",
+                              "Send ${selectedGeneralFiles.length + selectedMediaFiles.length + selectedApps.length} files",
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,

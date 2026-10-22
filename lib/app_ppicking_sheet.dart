@@ -35,6 +35,9 @@ class _AppPickerSheetState extends State<AppPickingSheet> {
                 ),
 
                 TextButton(
+                  style: TextButton.styleFrom(
+                    foregroundColor: const Color(0xFF258CF4),
+                ),
                   onPressed: () {
                     
                     Navigator.pop(context, pickedApps);
@@ -51,6 +54,7 @@ class _AppPickerSheetState extends State<AppPickingSheet> {
               itemBuilder: (context, index) {
                 AppInfo app = widget.apps[index];
 
+
                 return ListTile(
                   leading: app.icon != null ? Image.memory(app.icon!, width: 40, height: 40)
                   : const Icon(Icons.android, color: Colors.white54),
@@ -59,15 +63,18 @@ class _AppPickerSheetState extends State<AppPickingSheet> {
 
                   trailing: Checkbox(
                     value: pickedApps.contains(app),
-                    onChanged: (value) {
-                      setState(() {
-                        if (pickedApps.contains(app)) {
-                          pickedApps.remove(app);
-                        } else {
-                          pickedApps.add(app);
-                        }
-                      });
-                    }
+                     activeColor: const Color(0xFF258CF4),
+                     checkColor: Colors.white,
+                     side: const BorderSide(color: Colors.white54, width: 2),
+                      onChanged: (value) {
+                        setState(() {
+                          if (pickedApps.contains(app)) {
+                            pickedApps.remove(app);
+                          } else {
+                            pickedApps.add(app);
+                          }
+                        });
+                      }
                   ),
 
                   onTap: () {
