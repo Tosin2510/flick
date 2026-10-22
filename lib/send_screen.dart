@@ -1,3 +1,5 @@
+import 'package:file_picker/file_picker.dart';
+import 'package:flick/general_file_picking_service.dart';
 import 'package:flick/send_selection_button.dart';
 import 'package:flutter/material.dart';
 
@@ -10,10 +12,52 @@ class SendScreen extends StatefulWidget {
 
 class _SendScreenState extends State<SendScreen> {
 
+  int totalSizeOfBytes = 0;
+  List <PlatformFile> selectedGeneralFiles = [];
+  bool isLoading = false;
   String selectedIconButton = "Files";
   final Color activeButtonColor = const Color(0xFF258CF4);
   final Color inactiveButtonColor = const Color(0xFF1F1F1F);
   final Color inactiveTextColor = const Color(0XFFFFFFFF);
+
+
+Future<void> pickGeneralFiles(String fileCategory) async {
+  if (isLoading) return;
+
+  setState(() {
+    isLoading = true;
+  });
+
+  try {
+      final List<PlatformFile> files = await GeneralFilePickingService.pickFiles(fileCategory);
+
+      if (!mounted) return;
+      if (files.isNotEmpty) {
+        final List<PlatformFile> newFilesPick = [];
+        int noOfBytesAdded = 0;
+
+        for (final file in files) {
+          final bool isSelected = selectedGeneralFiles.any((selected) => selected.path == file.path);
+          if (!isSelected) {
+            newFilesPick.add(file);
+            totalSizeOfBytes += noOfBytesAdded;
+          }
+        }
+      }
+    } catch(e) {
+      debugPrint("Error picking general files: $e");
+    } finally{
+      setState(() {
+            isLoading = false;
+          });
+    }  
+}
+
+  @override
+  void dispose() {
+    FilePicker.clearTemporaryFiles();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -91,10 +135,12 @@ class _SendScreenState extends State<SendScreen> {
                         activeButtonColor: activeButtonColor, 
                         inactiveButtonColor: inactiveButtonColor, 
                         inactiveTextColor: inactiveTextColor,
-                        onPressed: () {
+                        onPressed: () async {
                           setState(() {
                             selectedIconButton = "Files";
                           });
+
+                          await pickGeneralFiles("Files");
                         }
                       ),
 
@@ -124,10 +170,12 @@ class _SendScreenState extends State<SendScreen> {
                         activeButtonColor: activeButtonColor, 
                         inactiveButtonColor: inactiveButtonColor, 
                         inactiveTextColor: inactiveTextColor,
-                        onPressed: () {
+                        onPressed: () async {
                           setState(() {
                             selectedIconButton = "Music";
                           });
+
+                          await pickGeneralFiles("Music");
                         }
                       ),
                       SizedBox(width: 3),
