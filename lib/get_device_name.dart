@@ -17,6 +17,15 @@ class GetDeviceName {
     return suffixVal;
   }
 
+  static Future<void> getStoredDeviceName(String? customName) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (customName == null || customName.trim().isEmpty) {
+      await prefs.remove('custom_device_name');
+    } else {
+      await prefs.setString('custom_device_name', customName.trim());
+    }
+  }
+
   static Future<String> getDeviceName() async {
     final name = await baseName();
     final suffixVal = await suffix();
