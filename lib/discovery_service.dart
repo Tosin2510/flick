@@ -36,6 +36,7 @@ class NetworkDiscoveryService {
 
     try {
       bonsoirDiscovery = BonsoirDiscovery(type: '_fileshare._tcp');
+      await bonsoirDiscovery!.initialize();
       discoverySub = bonsoirDiscovery!.eventStream?.listen((event) {
           handleDiscoveryEvent(event);
       });
@@ -62,12 +63,13 @@ class NetworkDiscoveryService {
         final service = event.service;
         if (service == null) return;
 
-        switch(event.type) {
-          case BonsoirDiscoveryEventType.discoveryServiceFound:
+        switch(event) {
+          case BonsoirDiscoveryServiceFoundEvent():
           if(bonsoirDiscovery == null) return;
+          service.resolve(bonsoirDiscovery!.serviceResolver);
           break;
           
-          case BonsoirDiscoveryEventType.discoveryServiceResolved:
+          case BonsoirDiscoveryServiceResolvedEvent():
           
           final resolvedIp = getServiceIp(service);
           if (resolvedIp != null && connectedIps.contains(resolvedIp)) return;
@@ -79,7 +81,7 @@ class NetworkDiscoveryService {
           }
           break;
 
-          case BonsoirDiscoveryEventType.discoveryServiceLost:
+          case BonsoirDiscoveryServiceLostEvent():
           discoveredDevices.removeWhere((device) => device.name == service.name);
           if (!deviceController.isClosed) {
               deviceController.add(List.from(discoveredDevices));
@@ -145,11 +147,8 @@ class NetworkDiscoveryService {
     }
   }
 
- String? getServiceIp(BonsoirService service) {
-  if (service is ResolvedBonsoirService) {
-    return service.ip;
-  }
-  return null;
+   String? getServiceIp(BonsoirService service) {
+  return service.host;
 }
   
   Future<List<String>> getAllLocalIps() async {

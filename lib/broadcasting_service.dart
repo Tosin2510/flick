@@ -39,6 +39,7 @@ class NetworkBroadcastingService {
 
     try {
       bonsoirBroadcast = BonsoirBroadcast(service: service);
+      await bonsoirBroadcast!.initialize();
       broadcastSub = bonsoirBroadcast!.eventStream?.listen((event) {
         handleBroadcastEvent(event);
       });
@@ -53,11 +54,11 @@ class NetworkBroadcastingService {
 
     if (_broadcastState == NetworkBroadcastingState.idle || _broadcastState == NetworkBroadcastingState.stopping) return;
 
-    switch(event.type) {
-      case BonsoirBroadcastEventType.broadcastStarted:
+    switch(event) {
+      case BonsoirBroadcastStartedEvent():
         _broadcastState = NetworkBroadcastingState.broadcasting;
         break;
-      case BonsoirBroadcastEventType.broadcastStopped:
+      case BonsoirBroadcastStoppedEvent():
         _broadcastState = NetworkBroadcastingState.idle;
         break;
       default:

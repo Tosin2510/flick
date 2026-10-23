@@ -29,8 +29,8 @@ class BuildTileWhenDevicesAreAvailable extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
-    final String platform = device.attributes!['platform']?.toUpperCase() ?? 'UNKNOWN';
-    final String version = device.attributes!['version'] ?? '';
+    final String platform = device.attributes['platform']?.toUpperCase() ?? 'UNKNOWN';
+    final String version = device.attributes['version'] ?? '';
 
     return GestureDetector(
        onTap: onTap,
