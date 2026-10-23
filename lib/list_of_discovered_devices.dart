@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flick/build_empty_state.dart';
 import 'package:flick/build_tile_when_devices_are_available.dart';
 import 'package:flick/discovery_service.dart';
+import 'package:flick/get_device_name.dart';
 import 'package:flutter/material.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
@@ -73,8 +74,9 @@ class _ListOfDiscoveredDevicesState extends State<ListOfDiscoveredDevices> with 
       isSending = true;
     });
 
-    debugPrint('Selected ${device.name} at $address');
-
+    final String senderName = await GetDeviceName.getDeviceName();
+    debugPrint('Selected ${device.name} at $address as $senderName');
+    
     if (mounted) {
       setState(() {
         isSending = false;
