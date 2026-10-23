@@ -15,6 +15,11 @@ class NetworkDiscoveryService {
 
   final List<BonsoirService> discoveredDevices = [];
 
+  Stream<List<BonsoirService>> get deviceStream => deviceController.stream;
+
+  bool get isScanning => _discoveryState == NetworkDiscoveryState.scanning;
+
+
   List<String> connectedIps = [];
 
   Timer? timer;
@@ -85,7 +90,7 @@ class NetworkDiscoveryService {
         }
   }
 
-  Future<void> stopScanning() async {
+  Future<void> stopDiscovery() async {
     if (_discoveryState == NetworkDiscoveryState.idle || _discoveryState == NetworkDiscoveryState.stopping) return;
 
     timer?.cancel();
@@ -165,7 +170,7 @@ class NetworkDiscoveryService {
     return ips;
   }
   Future<void> dispose() async{
-    await stopScanning();
+    await stopDiscovery();
     await deviceController.close();
   }
 }
