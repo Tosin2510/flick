@@ -28,8 +28,7 @@ class _ProgressScreenState extends  State<ProgressScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-
+    
     return Scaffold(
       backgroundColor: const Color(0xFF141414),
       body: SafeArea(
