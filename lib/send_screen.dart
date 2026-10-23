@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flick/app_picking_service.dart';
 import 'package:flick/app_ppicking_sheet.dart';
 import 'package:flick/general_file_picking_service.dart';
+import 'package:flick/list_of_discovered_devices.dart';
 import 'package:flick/media_picking_service.dart';
 import 'package:flick/path_to_apks_service.dart';
 import 'package:flick/send_selection_button.dart';
@@ -520,8 +521,44 @@ Future<void> pickApps() async {
                       
                       bottom: MediaQuery.of(context).padding.bottom + (MediaQuery.of(context).size.height * 0.02),
                       child: GestureDetector(
-                        onTap: () {
-                          // To be implemented.
+                                                onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            backgroundColor: const Color(0xFF1E1E24),
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(top: Radius.circular(24))
+                            ),
+
+                            builder: (_) {
+                              return DraggableScrollableSheet(
+                                
+                                initialChildSize: 0.6,
+                                minChildSize: 0.4,
+                                maxChildSize: 0.92,
+                                expand: false,
+
+                                builder: (_, scrollController) {
+                                  return ListOfDiscoveredDevices(
+                                    selectedGeneralFiles: selectedGeneralFiles,
+                                    selectedMediaFiles: selectedMediaFiles,
+                                    onComplete: () {
+                                      setState(() {
+                                        selectedGeneralFiles.clear();
+                                        sizeOfGeneralFilesInBytes.clear();
+                                        selectedMediaFiles.clear();
+                                        sizeOfMediaFilesInBytes.clear();
+                                        selectedApps.clear();
+                                        sizeOfAppsInBytes.clear();
+                                        apkPathsOfApps.clear();
+                                        totalSizeOfBytes = 0;
+                                      });
+                                    }
+                                  );
+                                }
+                              );
+                            }
+                          );
                         },
 
                         child: Container(
