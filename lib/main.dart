@@ -1,3 +1,5 @@
+import 'package:flick/broadcasting_service.dart';
+import 'package:flick/get_device_name.dart';
 import 'package:flick/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -25,7 +27,40 @@ class MyApp extends StatelessWidget {
           surface: Color(0xFF1E1E24),
         ),
       ),
-      home: HomeScreen(),
+      home: const AppRoot(),
     );
+  }
+}
+
+class AppRoot extends StatefulWidget {
+  const AppRoot({super.key});
+
+  @override
+  State<AppRoot> createState() => _AppRootState();
+}
+
+class _AppRootState extends State<AppRoot> {
+  final NetworkBroadcastingService networkBroadcastingService = NetworkBroadcastingService();
+
+  @override
+  void initState() {
+    super.initState();
+    initializeBroadcasting();
+  }
+
+  @override
+  void dispose() {
+    networkBroadcastingService.dispose();
+    super.dispose();
+  }
+
+  Future<void> initializeBroadcasting() async {
+    final deviceName = await GetDeviceName.getDeviceName();
+    await networkBroadcastingService.startBroadcasting(deviceName: deviceName);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return HomeScreen();
   }
 }
