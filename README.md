@@ -23,7 +23,7 @@ Flutter
 
 ## Download
 
-Get the latest APK from the release page.
+Get the latest APK from the [Release](https://github.com/Tosin2510/flick/releases/tag/v1.0.0) page.
 
 Not sure which APK to pick? Choose `app-arm64-v8a-release.apk`. It works on almost all modern phones.
 
