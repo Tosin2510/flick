@@ -231,6 +231,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 onChanged: (direction) {
                   setState(() {
                     activeTab = direction;
+                    selectionMethod = false;
+                    selectedItemIds.clear();
                   });
                 },
                 

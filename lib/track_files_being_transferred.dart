@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:flick/history_service.dart';
+
 class TrackFilesBeingTransferred {
   TrackFilesBeingTransferred._internal();
 
@@ -45,7 +47,9 @@ class TrackFilesBeingTransferred {
   void transferFailed(String id) {
      final item = transferItem.where((val) => val.fileId == id).firstOrNull;
     if (item == null) return;
+    if (item.status == TransferStatus.done) return;
     item.status = TransferStatus.failed;
+    HistoryService.instance.shareRecord(item);
     controller.add(List.from(transferItem));
   }
 
@@ -57,6 +61,7 @@ class TrackFilesBeingTransferred {
     if (savedPath != null) {
       item.savedPath = savedPath;
     }
+    HistoryService.instance.shareRecord(item);
     controller.add(List.from(transferItem));
   }
 }
