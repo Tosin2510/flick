@@ -1,10 +1,87 @@
+import 'dart:async';
+
 import 'package:flick/app_animation_logo.dart';
 import 'package:flick/get_device_name.dart';
+import 'package:flick/progress_screen.dart';
+import 'package:flick/receive_service.dart';
+import 'package:flick/session_of_incoming_files.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ReceiveScreen extends StatelessWidget {
+class ReceiveScreen extends StatefulWidget {
   const ReceiveScreen({super.key});
+
+  @override
+  State<ReceiveScreen> createState() => _ReceiveScreenState();
+}
+
+class _ReceiveScreenState extends State<ReceiveScreen> {
+  StreamSubscription<SessionOfIncomingFiles>? sessionSub;
+
+  @override
+  void initState() {
+    super.initState();
+    sessionSub = ReceiveService.instance.incomingSessionStream.listen((session) { showIncomingDialog(session);
+    });
+  }
+
+  void showIncomingDialog(SessionOfIncomingFiles session) {
+     final totalSize = session.files.fold<int>(0, (sum, fil) => sum + fil.fileSize);
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AlertDialog(
+        backgroundColor: const Color(0xFF1E1E24),
+        title: const Text('Incoming files',
+        style: TextStyle(
+          color: Colors.white,
+        )
+        ),
+
+        content: Text(
+          '${session.sendingDevice} wants to send ${session.files.length} file(s),'
+          '${(totalSize / (1024 * 1024)).toStringAsFixed(1)} MB',
+          style: const TextStyle(color: Colors.white70),
+        ),
+
+        actions: [
+          TextButton(
+             onPressed: () {
+              ReceiveService.instance.respondToSession(
+                session.sessionId, false);
+                Navigator.pop(context);
+            },
+            child: const Text('Decline',
+              style: TextStyle(color: Colors.redAccent),
+            )
+          ),
+
+          ElevatedButton(
+            onPressed: () {
+              ReceiveService.instance.respondToSession(
+                session.sessionId, true);
+                Navigator.pop(context);
+
+                Navigator.of(context, rootNavigator: true).push(
+                  MaterialPageRoute(
+                    builder: (_) => const ProgressScreen(),
+                    fullscreenDialog: true,
+                  )
+                );
+            },
+            child: const Text('Accept',
+            )
+          )
+        ]
+      )
+    );
+  }
+
+  @override
+  void dispose() {
+    sessionSub?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
