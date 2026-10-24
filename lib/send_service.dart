@@ -39,7 +39,7 @@ class SendService {
         '$baseUrl/prepare',
         data: {
           'sessionId': sessionId,
-          'sendingDevice': sendingDeviceName,
+          'deviceName': sendingDeviceName,
           'files': files.map((file) => file.toJson()).toList(),
         },
 
