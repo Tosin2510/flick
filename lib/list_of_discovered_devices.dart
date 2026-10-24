@@ -4,22 +4,30 @@ import 'package:bonsoir/bonsoir.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flick/build_empty_state.dart';
 import 'package:flick/build_tile_when_devices_are_available.dart';
+import 'package:flick/convert_outgoing_file.dart';
 import 'package:flick/discovery_service.dart';
 import 'package:flick/get_device_name.dart';
+import 'package:flick/send_service.dart';
 import 'package:flutter/material.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
+import 'package:installed_apps/app_info.dart';
 
 class ListOfDiscoveredDevices extends StatefulWidget {
 
   final List<PlatformFile> selectedGeneralFiles;
   final List<AssetEntity> selectedMediaFiles;
   final VoidCallback onComplete;
+  final List<AppInfo> selectedApps;
+  final List<List<String>> apkPathsOfApps;
+  
 
   const ListOfDiscoveredDevices({
     super.key,
     required this.selectedGeneralFiles,
     required this.selectedMediaFiles,
     required this.onComplete,
+    this.selectedApps = const [],
+    this.apkPathsOfApps = const [],
   });
 
   @override
@@ -75,8 +83,24 @@ class _ListOfDiscoveredDevicesState extends State<ListOfDiscoveredDevices> with 
     });
 
     final String senderName = await GetDeviceName.getDeviceName();
-    debugPrint('Selected ${device.name} at $address as $senderName');
-    
+
+    final files = await ConvertFileToBeSent.convertAllOutgoingFiles(
+      platformFiles: widget.selectedGeneralFiles,
+      mediaFiles: widget.selectedMediaFiles,
+      apps: widget.selectedApps,
+      apkPaths: widget.apkPathsOfApps,
+    );
+
+    final sendOutcome = await SendService().sendFiles(
+      targetDeviceIp: address,
+      sendingDeviceName: senderName,
+      files: files,
+    );
+
+    if (sendOutcome == SendOutcome.accepted && mounted) {
+      widget.onComplete();
+    }
+
     if (mounted) {
       setState(() {
         isSending = false;

@@ -542,6 +542,9 @@ Future<void> pickApps() async {
                                   return ListOfDiscoveredDevices(
                                     selectedGeneralFiles: selectedGeneralFiles,
                                     selectedMediaFiles: selectedMediaFiles,
+                                    selectedApps: selectedApps,
+                                    apkPathsOfApps: apkPathsOfApps,
+                                    
                                     onComplete: () {
                                       setState(() {
                                         selectedGeneralFiles.clear();
