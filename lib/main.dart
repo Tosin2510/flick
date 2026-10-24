@@ -1,6 +1,6 @@
 import 'dart:async';
+import 'package:flick/transfer_button_indicator.dart';
 import 'dart:io';
-
 import 'package:flick/broadcasting_service.dart';
 import 'package:flick/get_device_name.dart';
 import 'package:flick/home_screen.dart';
@@ -42,6 +42,14 @@ class MyApp extends StatelessWidget {
         ),
       ),
       home: const AppRoot(),
+      builder: (context, child) {
+        return Stack(
+          children: [
+            child ?? const SizedBox.shrink(),
+            const TransferButtonIndicator(),
+          ]
+        );
+      }
     );
   }
 }
