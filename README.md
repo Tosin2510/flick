@@ -52,7 +52,8 @@ Only do this if you want to build the app yourself.
 
 MIT License
 
-## Screenshots from the app.
-
-To be added.
-
+## Some screenshots from the app.
+![alt text](image.png)
+![alt text](image-1.png)
+![alt text](image-2.png)
+![alt text](image-3.png)
