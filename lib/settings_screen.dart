@@ -1,5 +1,6 @@
 import 'package:flick/cache_service.dart';
 import 'package:flick/get_device_name.dart';
+import 'package:flick/history_service.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -59,7 +60,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
 
     if (clear == true) {
-      // Clear transfer history logic here
+       final allRow = await HistoryService.instance.getAllTransferHistory();
+      final allIds = allRow.map((val) => val['id'] as String).toList();
+      await HistoryService.instance.deleteTransferHistory(allIds);
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Transfer history cleared'),)
+        );
+      }
     }
   }
 
@@ -144,7 +153,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF000000),
+      backgroundColor: const Color(0xFF141414),
 
       body: SafeArea(
         child: Padding(
