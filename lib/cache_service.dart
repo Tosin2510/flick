@@ -20,16 +20,17 @@ class CacheService {
     return totalSize;
   }
 
-  static Future<void> clearCache() async {
-  final cacheDir = await getTemporaryDirectory();
-  if (await cacheDir.exists()) {
-    try {
+    static Future<void> clearCache() async {
+    final cacheDir = await getTemporaryDirectory();
+    if (await cacheDir.exists()) {
       await for (final entity in cacheDir.list()) {
-        await entity.delete(recursive: true);
+        try {
+          await entity.delete(recursive: true);
+        } catch (e) {
+          debugPrint('Error clearing cache: $e');
+        }
       }
-    } catch (e) {
-      debugPrint('Error clearing cache: $e');
     }
   }
-}
+
 }
