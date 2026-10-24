@@ -1,6 +1,7 @@
 import 'dart:core';
 
 import 'package:flick/track_files_being_transferred.dart';
+import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -10,6 +11,8 @@ class HistoryService {
   static final HistoryService instance = HistoryService._internal();
 
    Database? database;
+
+   final ValueNotifier<int> changes = ValueNotifier<int>(0);
 
    Future<Database> get _db async {
     if (database != null) return database!;
@@ -39,6 +42,7 @@ class HistoryService {
 
       Future<void> shareRecord(ItemToBeTransferred item) async {
          final db = await _db;
+         debugPrint('Saving history: ${item.fileName} ${item.direction.name} ${item.status.name}');
          await db.insert(
            'flick_history',
            {
@@ -54,6 +58,7 @@ class HistoryService {
 
            conflictAlgorithm: ConflictAlgorithm.replace,
          );
+         changes.value++;
       }
 
     Future<List<Map<String, dynamic>>> getAllTransferHistory() async {
@@ -69,5 +74,6 @@ class HistoryService {
         where: 'id IN (${List.filled(ids.length, '?').join(',')})',
         whereArgs: ids,
       );
+      changes.value++;
     }
 }

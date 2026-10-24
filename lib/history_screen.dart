@@ -21,10 +21,17 @@ class _HistoryScreenState extends State<HistoryScreen> {
   bool selectionMethod = false;
   final Set<String> selectedItemIds = {};
 
-  @override
+    @override
   void initState() {
     super.initState();
     loadHistory();
+    HistoryService.instance.changes.addListener(loadHistory);
+  }
+
+  @override
+  void dispose() {
+    HistoryService.instance.changes.removeListener(loadHistory);
+    super.dispose();
   }
 
   Future<void> loadHistory() async {
