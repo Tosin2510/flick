@@ -1,6 +1,6 @@
 # Flick
 
-A file sharing app I built with Flutter. You basically pick some files, your device search for another phone nearby, and sends the picked file to the phone. Internet connection is not needed, it is just that the two devices should be on the same local network(either they are both connected to the same third party wifi or one phone is connected to the hotspot of the other device). I built it because it seemed like an interesting project to build.
+A file sharing app I built with Flutter. You basically pick some files, your device search for another phone nearby, and sends the picked file to the phone. Internet connection is not needed, it is just that the two devices should be on the same local network(either they are both connected to the same third party wifi or the receiving phone is connected to the hotspot of the sending device). I built it because it seemed like an interesting project to build.
 
 ## What it actually is?
 
@@ -11,7 +11,7 @@ Open the app on both the sending and receiving phones and they find each other o
 Basically, both phones need to be on the same local network. Either
 
 - both are on the same Wi-Fi, or
-- one phone switches on its hotspot and the other connects to it
+- the sending phone switches on its hotspot and the other receiving phone connects to it
 
 You have to turn the hotspot on yourself. If you don't see the other phone, check that first.
 
